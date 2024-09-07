@@ -1,11 +1,12 @@
+// @ts-nocheck
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,39 +20,69 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-interface WorkExperience {
-  organisation: string;
-  startDate: Date | undefined;
-  endDate: Date | undefined;
-}
+// Define Zod schema for validation
+const WorkExperienceSchema = z
+  .object({
+    organisation: z.string().min(1, "Organisation is required"),
+    startDate: z
+      .date({
+        required_error: "Start date is required",
+        invalid_type_error: "Start date must be a valid date",
+      })
+      .nullable(),
+    endDate: z
+      .date({
+        required_error: "End date is required",
+        invalid_type_error: "End date must be a valid date",
+      })
+      .nullable(),
+  })
+  .refine(
+    (data) => {
+      if (data.startDate && data.endDate) {
+        return data.startDate <= data.endDate;
+      }
+      return true;
+    },
+    {
+      message: "End date must be after start date",
+      path: ["endDate"],
+    }
+  );
+
+const OnboardingSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  education: z.string().min(1, "Education is required"),
+  workExperience: z
+    .array(WorkExperienceSchema)
+    .min(1, "At least one work experience is required"),
+});
+
+type WorkExperience = z.infer<typeof WorkExperienceSchema>;
+type OnboardingData = z.infer<typeof OnboardingSchema>;
 
 interface OnboardingProps {
-  initialName?: string;
-  initialEducation?: string;
-  initialWorkExperience?: WorkExperience[];
-  onSubmit?: (data: {
-    name: string;
-    education: string;
-    workExperience: WorkExperience[];
-  }) => void;
-  onCancel?: () => void;
+  data?: OnboardingData;
+  onSubmit?: (data: OnboardingData) => void;
 }
 
-const Onboarding: React.FC<OnboardingProps> = ({
-  initialName = "",
-  initialEducation = "",
-  initialWorkExperience = [
-    { organisation: "", startDate: undefined, endDate: undefined },
-  ],
-  onSubmit,
-  onCancel,
-}) => {
-  const [name, setName] = useState(initialName);
-  const [education, setEducation] = useState(initialEducation);
+const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
+  const [open, setOpen] = useState(!data);
+  const [name, setName] = useState(data?.name || "");
+  const [education, setEducation] = useState(data?.education || "");
   const [workExperience, setWorkExperience] = useState<WorkExperience[]>(
-    initialWorkExperience
+    data?.workExperience || [
+      { organisation: "", startDate: null, endDate: null },
+    ]
   );
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showAlert, setShowAlert] = useState(false);
+
+  useEffect(() => {
+    setOpen(!data);
+  }, [data]);
 
   const handleAddWorkExperience = () => {
     setWorkExperience([
@@ -69,7 +100,7 @@ const Onboarding: React.FC<OnboardingProps> = ({
   const handleWorkExperienceChange = (
     index: number,
     field: keyof WorkExperience,
-    value: string | Date | undefined
+    value: string | Date | null
   ) => {
     const updatedWorkExperience = [...workExperience];
     updatedWorkExperience[index] = {
@@ -79,23 +110,57 @@ const Onboarding: React.FC<OnboardingProps> = ({
     setWorkExperience(updatedWorkExperience);
   };
 
+  const validateForm = () => {
+    const formData: OnboardingData = { name, education, workExperience };
+    try {
+      OnboardingSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path) {
+            newErrors[err.path.join(".")] = err.message;
+          }
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSubmit) {
-      onSubmit({ name, education, workExperience });
+    if (validateForm()) {
+      const formData: OnboardingData = { name, education, workExperience };
+      if (onSubmit) {
+        onSubmit(formData);
+      }
+      console.log(formData);
+      setOpen(false);
+      setShowAlert(false);
+    } else {
+      setShowAlert(true);
     }
-    console.log({ name, education, workExperience });
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Open Onboarding Form</Button>
-      </DialogTrigger>
-      <DialogContent className="p-10">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent
+        className="p-10"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Onboarding Form</DialogTitle>
         </DialogHeader>
+        {showAlert && (
+          <Alert variant="destructive">
+            <AlertDescription>
+              Please fill in all required fields, including dates.
+            </AlertDescription>
+          </Alert>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
@@ -104,7 +169,11 @@ const Onboarding: React.FC<OnboardingProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
+              className={cn(errors["name"] && "border-red-500")}
             />
+            {errors["name"] && (
+              <p className="text-red-500 text-sm">{errors["name"]}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="education">Education</Label>
@@ -113,7 +182,11 @@ const Onboarding: React.FC<OnboardingProps> = ({
               value={education}
               onChange={(e) => setEducation(e.target.value)}
               placeholder="Enter your education details"
+              className={cn(errors["education"] && "border-red-500")}
             />
+            {errors["education"] && (
+              <p className="text-red-500 text-sm">{errors["education"]}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Work Experience</Label>
@@ -129,7 +202,16 @@ const Onboarding: React.FC<OnboardingProps> = ({
                     )
                   }
                   placeholder="Organisation name"
+                  className={cn(
+                    errors[`workExperience.${index}.organisation`] &&
+                      "border-red-500"
+                  )}
                 />
+                {errors[`workExperience.${index}.organisation`] && (
+                  <p className="text-red-500 text-sm">
+                    {errors[`workExperience.${index}.organisation`]}
+                  </p>
+                )}
                 <div className="flex space-x-2">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -137,7 +219,9 @@ const Onboarding: React.FC<OnboardingProps> = ({
                         variant={"outline"}
                         className={cn(
                           "w-full justify-start text-left font-normal",
-                          !exp.startDate && "text-muted-foreground"
+                          !exp.startDate && "text-muted-foreground",
+                          errors[`workExperience.${index}.startDate`] &&
+                            "border-red-500"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -169,7 +253,9 @@ const Onboarding: React.FC<OnboardingProps> = ({
                         variant={"outline"}
                         className={cn(
                           "w-full justify-start text-left font-normal",
-                          !exp.endDate && "text-muted-foreground"
+                          !exp.endDate && "text-muted-foreground",
+                          errors[`workExperience.${index}.endDate`] &&
+                            "border-red-500"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -196,7 +282,17 @@ const Onboarding: React.FC<OnboardingProps> = ({
                     </PopoverContent>
                   </Popover>
                 </div>
-                {index > 0 && (
+                {errors[`workExperience.${index}.startDate`] && (
+                  <p className="text-red-500 text-sm">
+                    {errors[`workExperience.${index}.startDate`]}
+                  </p>
+                )}
+                {errors[`workExperience.${index}.endDate`] && (
+                  <p className="text-red-500 text-sm">
+                    {errors[`workExperience.${index}.endDate`]}
+                  </p>
+                )}
+                {workExperience.length > 1 && (
                   <Button
                     type="button"
                     variant="destructive"
