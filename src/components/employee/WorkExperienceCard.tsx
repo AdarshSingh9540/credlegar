@@ -49,7 +49,7 @@ const WorkExperienceCard: React.FC<WorkExperienceCardProps> = ({
 
   return (
     <>
-    <Card className="w-full max-w-md mx-auto bg-gray-800 rounded-xl overflow-hidden border-primary text-white shadow-lg">
+    <Card className="w-full max-w-md mx-auto bg-gray-800 rounded-xl overflow-hidden border-primary text-white shadow-lg mt-[7rem]">
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-2xl font-bold">{companyName}</h2>
