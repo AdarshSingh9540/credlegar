@@ -2,9 +2,12 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CloudIcon } from "../Icons";
-import { RegisterLink,LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import {
+  RegisterLink,
+  LogoutLink,
+} from "@kinde-oss/kinde-auth-nextjs/components";
 
-export default function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
+export default function Header() {
   return (
     <header className="flex h-16 items-center bg-foreground border-b border-border/20 text-white fixed w-full z-[5] justify-between px-6 md:px-12">
       <Link href="#" className="flex items-center gap-2" prefetch={false}>
@@ -42,25 +45,19 @@ export default function Header({ isAuthenticated }: { isAuthenticated: boolean }
         </Link>
       </nav>
 
-
-      {isAuthenticated ? (
-               <RegisterLink className="text-white w-auto font-semibold bg-blue-600 flex justify-center items-center rounded-lg p-2">
-               Register Now
-             </RegisterLink>
-      ) : (
-
-        <LogoutLink className="text-white w-auto font-semibold bg-red-600 flex justify-center items-center rounded-lg p-2">Log out</LogoutLink>
-      )}
+      <RegisterLink className="text-white w-auto font-semibold bg-blue-600 flex justify-center items-center rounded-lg p-2">
+        Register Now
+      </RegisterLink>
     </header>
   );
 }
 
-export async function getServerSideProps(context:any) {
+export async function getServerSideProps(context: any) {
   const { isAuthenticated } = getKindeServerSession(context.req);
 
   return {
     props: {
-      isAuthenticated: await isAuthenticated(), 
+      isAuthenticated: await isAuthenticated(),
     },
   };
 }
