@@ -14,7 +14,11 @@ export default function Page() {
       {/* Main content */}
       <div className="flex-1 p-10 ">
         <Actions />
-        <WorkExperienceCard
+         <div className='flex flex-col-2'>
+           
+           <div className='opacity-50 mx-[5rem]'>
+            
+         <WorkExperienceCard
           companyName="Acme Inc."
           jobTitle="Senior Software Engineer"
           jobDescription="Developed and maintained enterprise-level web applications."
@@ -24,6 +28,21 @@ export default function Page() {
           verificationStatus="Pending"
           userEmail="user@example.com"
         />
+           </div>
+
+            <div>
+            <WorkExperienceCard
+          companyName="Acme Inc."
+          jobTitle="Senior Software Engineer"
+          jobDescription="Developed and maintained enterprise-level web applications."
+          skills={['React', 'TypeScript', 'Node.js']}
+          timeline="Jan 2020 - Present"
+          isCompanyOnPlatform={false}
+          verificationStatus="Verified"
+          userEmail="user@example.com"
+        />
+            </div>
+         </div>
       </div>
     </main>
   );
