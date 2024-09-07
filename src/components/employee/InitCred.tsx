@@ -19,7 +19,7 @@ const InitCredentialStore: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ privateKey,documentHash:"fakedocumenthash" }),
+        body: JSON.stringify({documentHash:"fakedocumenthash" }),
       });
 
       const data = await response.json();
@@ -44,14 +44,14 @@ const InitCredentialStore: React.FC = () => {
           <label htmlFor="privateKey" className="block text-gray-700 text-sm font-bold mb-2">
             Private Key
           </label>
-          <input
+          {/* <input
             type="text"
             id="privateKey"
             value={privateKey}
             onChange={(e) => setPrivateKey(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             required
-          />
+          /> */}
         </div>
         <button
           type="submit"

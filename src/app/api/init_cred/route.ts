@@ -1,6 +1,6 @@
 // app/api/set-credential/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { Aptos, AptosConfig, Network, Account } from "@aptos-labs/ts-sdk";
+import { Aptos, AptosConfig, Network, Account, AccountAddress, Ed25519PrivateKey } from "@aptos-labs/ts-sdk";
 
 const APTOS_NETWORK = Network.DEVNET;
 const config = new AptosConfig({ network: APTOS_NETWORK });
@@ -11,21 +11,41 @@ const MODULE_NAME = 'credentials';
 
 export async function POST(request: NextRequest) {
   try {
-    const { privateKey, documentHash } = await request.json();
-    console.log(privateKey)
+    const {privateKey, documentHash,first } = await request.json();
+    // console.log(privateKey)
     console.log(documentHash)
-    if (!privateKey || !documentHash) {
+    if (!documentHash) {
       return NextResponse.json({ error: 'Missing privateKey or documentHash' }, { status: 400 });
     }
 
-    const account = Account.fromPrivateKey(privateKey);
+    const alice = Account.generate()
 
     // Get the public key (useful for debugging or future use)
-    const publicKey = account.publicKey
-    console.log('Public Key:', publicKey);
+   console.log('||---------accountaddress--------||')
+  console.log(alice.privateKey)
+  
+  await aptos.fundAccount({
+    accountAddress: alice.accountAddress,
+    amount: 100_000_000,
+  });
 
+ 
+      // Retrieve account information
+      const balance = async (
+        name: string,
+        accountAddress: AccountAddress,
+      ): Promise<number> => {
+        const amount = await aptos.getAccountAPTAmount({
+          accountAddress,
+        });
+        console.log(`${name}'s balance is: ${amount}`);
+        return amount;
+      };
+  
+  await balance("Alice", alice.accountAddress);
+  
     const transaction = await aptos.transaction.build.simple({
-      sender: account.accountAddress,
+      sender: alice.accountAddress,
       data: {
         function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::set_credential`,
         typeArguments: [],
@@ -33,9 +53,9 @@ export async function POST(request: NextRequest) {
       },
     });
     console.log('---------transaction--------')
-  console.log(transaction)
-    const submittedTxn=await aptos.signAndSubmitTransaction({signer:account,transaction:transaction})
-
+  console.log(transaction.bcsToHex())
+    const submittedTxn=await aptos.signAndSubmitTransaction({signer:alice,transaction:transaction})
+console.log(submittedTxn)
     const result = await aptos.waitForTransaction({ transactionHash: submittedTxn.hash });
 
     return NextResponse.json({
