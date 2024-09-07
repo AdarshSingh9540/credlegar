@@ -1,11 +1,11 @@
 import WorkExperienceCard from "@/components/employee/WorkExperienceCard";
 import Actions from "@/components/employee/Actions";
 
-
+import InitCredentialStore from "@/components/employee/InitCred";
 export default function page() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-10">
-      <Actions/>
+      {/* <Actions/> */}
      <WorkExperienceCard
         companyName="Acme Inc."
         jobTitle="Senior Software Engineer"
@@ -16,6 +16,7 @@ export default function page() {
         verificationStatus="Pending"
         userEmail="user@example.com"
       />
+      <InitCredentialStore/>
     </main>
   )
 }
