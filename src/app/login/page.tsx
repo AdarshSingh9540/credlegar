@@ -1,8 +1,15 @@
-import Login from "@/components/Login";
-import React from "react";
+
+'use client'
+import Login from '@/components/Login'
+import React from 'react'
+
 
 function page() {
-  return <div>{<Login />}</div>;
+  return (
+    <div>
+        <Login/>
+    </div>
+  )
 }
 
-export default page;
+export default page

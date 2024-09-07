@@ -1,31 +1,27 @@
 'use client';
-import { useState, useEffect } from 'react';
-import useDarkMode from '../hooks/useDarkMode'; // Import the hook
+import { useState } from 'react';
+import { useRouter } from 'next/router'; 
+import useDarkMode from '../hooks/useDarkMode';
 import type { NextPage } from 'next';
 
 const Signup: NextPage = () => {
-  useDarkMode(); // Apply dark mode based on system preference
+  useDarkMode();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true); // Ensures this runs only on the client
-  }, []);
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000)); 
       console.log('Signup successful:', { username, email });
 
-      if (isClient) {
-        // router.push('/dashboard');
-      }
+    
+      window.location.href = '/login'; 
     } catch (err) {
       setError('Signup failed. Please try again.');
     }
@@ -36,7 +32,7 @@ const Signup: NextPage = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-8 border border-gray-300 dark:border-gray-700">
           <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Sign up for Decentralized Aptos
+            Sign up for Aptos
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
