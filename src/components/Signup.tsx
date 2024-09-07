@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useRouter } from 'next/router'; // Import the router
 import useDarkMode from '../hooks/useDarkMode'; // Import the hook
 import type { NextPage } from 'next';
 
@@ -9,23 +10,18 @@ const Signup: NextPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true); // Ensures this runs only on the client
-  }, []);
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000)); 
       console.log('Signup successful:', { username, email });
 
-      if (isClient) {
-        // router.push('/dashboard');
-      }
+    
+      window.location.href = '/login'; 
     } catch (err) {
       setError('Signup failed. Please try again.');
     }
