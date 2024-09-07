@@ -2,65 +2,48 @@
 import { useState, useEffect } from 'react';
 import useDarkMode from '../hooks/useDarkMode'; // Import the hook
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
 
-const Signup: NextPage = () => {
+const Login: NextPage = () => {
   useDarkMode(); // Apply dark mode based on system preference
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
+//   const route = useRouter();
 
   useEffect(() => {
-    setIsClient(true); // Ensures this runs only on the client
+    setIsClient(true);
   }, []);
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Signup successful:', { username, email });
-
-      if (isClient) {
-        // router.push('/dashboard');
-      }
     } catch (err) {
-      setError('Signup failed. Please try again.');
+      setError('Login failed. Please try again.');
     }
+
+    // route.push('/signup')
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-8 border border-gray-300 dark:border-gray-700">
-          <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Sign up for Decentralized Aptos
+      <div className="max-w-md w-full space-y-8 rounded-lg">
+        <div className="bg-white dark:bg-gray-800  shadow-md rounded-lg p-8 border border-gray-300 dark:border-gray-700">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+            Log in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?{' '}
-            <a href="/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-              Log in
+            Or create for a{' '}
+            <a href="/signup" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+               new account
             </a>
           </p>
-          <form className="mt-8 space-y-6" onSubmit={handleSignup}>
+          <form className="mt-8 space-y-6" onSubmit={handleLogin}>
             <div className="rounded-md shadow-sm space-y-4">
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Username
-                </label>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Email address
@@ -69,9 +52,8 @@ const Signup: NextPage = () => {
                   id="email"
                   name="email"
                   type="email"
-                  autoComplete="email"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm "
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -85,7 +67,6 @@ const Signup: NextPage = () => {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="new-password"
                   required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   value={password}
@@ -101,7 +82,7 @@ const Signup: NextPage = () => {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                Sign up
+                Log in
               </button>
             </div>
           </form>
@@ -111,4 +92,4 @@ const Signup: NextPage = () => {
   );
 };
 
-export default Signup;
+export default Login;
