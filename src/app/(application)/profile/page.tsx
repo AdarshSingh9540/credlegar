@@ -9,8 +9,9 @@ import {
   CheckCircle,
   Clock,
 } from "lucide-react";
+import { Icon } from "next/dist/lib/metadata/types/metadata-types";
 
-const Badge = ({ status }) => {
+const Badge = ({ status }: { status: string }) => {
   const badgeConfig = {
     verified: {
       icon: CheckCircle,

@@ -10,17 +10,17 @@ export default function page() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-10">
       {/* <Actions/> */}
-     <WorkExperienceCard
+      <WorkExperienceCard
         companyName="Acme Inc."
         jobTitle="Senior Software Engineer"
         jobDescription="Developed and maintained enterprise-level web applications."
-        skills={['React', 'TypeScript', 'Node.js']}
+        skills={["React", "TypeScript", "Node.js"]}
         timeline="Jan 2020 - Present"
         isCompanyOnPlatform={false}
         verificationStatus="Pending"
         userEmail="user@example.com"
       />
-      <InitCredentialStore/>
+      <InitCredentialStore />
     </main>
   );
 }
