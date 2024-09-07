@@ -1,6 +1,10 @@
+// @ts-nocheck
+"use client";
+import React, { useState } from "react";
+import { Sidebar } from "@/components/SideBar"; // Update the import path according to your project structure
 import WorkExperienceCard from "@/components/employee/WorkExperienceCard";
 import Actions from "@/components/employee/Actions";
-
+import Onboarding from "@/components/Onboarding";
 import InitCredentialStore from "@/components/employee/InitCred";
 export default function page() {
   return (
@@ -18,5 +22,5 @@ export default function page() {
       />
       <InitCredentialStore/>
     </main>
-  )
+  );
 }

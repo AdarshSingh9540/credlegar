@@ -1,16 +1,15 @@
-'use client';
+'use client'
 import { useState, useEffect } from 'react';
-import useDarkMode from '../hooks/useDarkMode'; // Import the hook
+import useDarkMode from '../hooks/useDarkMode'; 
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 
 const Login: NextPage = () => {
-  useDarkMode(); // Apply dark mode based on system preference
+  useDarkMode(); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
-//   const route = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -26,7 +25,7 @@ const Login: NextPage = () => {
       setError('Login failed. Please try again.');
     }
 
-    // route.push('/signup')
+    window.location.href = '/signup'; 
   };
 
   return (
