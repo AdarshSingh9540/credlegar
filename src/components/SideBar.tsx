@@ -3,9 +3,10 @@
 import React from 'react';
 import { Calendar, Menu, PlusSquare, Search } from 'lucide-react';
 import Link from 'next/link';
-
+import {getKindeServerSession} from "@kinde-oss/kinde-auth-nextjs/server";
 export const Sidebar: React.FC = () => {
-
+  // const {getUser} = getKindeServerSession();
+  // const user = await getUser();
   const sidebarItems = [
     { icon: <Search size={18} />, text: 'Search', href: '/' },
     { icon: <PlusSquare size={18} />, text: 'Home', href: '/' },
@@ -20,7 +21,7 @@ export const Sidebar: React.FC = () => {
             <div className="w-8 h-8 bg-blue-500 rounded-full">
               <img src="https://avatars.githubusercontent.com/u/131537713?v=4" alt="User Avatar" />
             </div>
-            <span className="font-semibold text-lg">Adarsh Singh</span>
+            <span className="font-semibold text-lg">Adarsh</span>
           </div>
           <button className="lg:hidden">
             <span className="material-symbols-outlined">close</span>
