@@ -145,11 +145,29 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
     }
   };
 
+    const [skills, setSkills] = useState([{ name: ''}]);
+
+    const handleSkillChange = (index, field, value) => {
+    const newSkills = [...skills];
+    newSkills[index][field] = value;
+    setSkills(newSkills);
+  };
+
+  const handleAddSkill = () => {
+    setSkills([...skills, { name: ''}]);
+  };
+
+  const handleRemoveSkill = (index) => {
+    const newSkills = skills.filter((_, i) => i !== index);
+    setSkills(newSkills);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         className="p-10"
         onInteractOutside={(e) => e.preventDefault()}
+        hideCloseButton
       >
         <DialogHeader>
           <DialogTitle>Onboarding Form</DialogTitle>
@@ -312,6 +330,42 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
               onClick={handleAddWorkExperience}
             >
               <Plus className="mr-2 h-4 w-4" /> Add Work Experience
+            </Button>
+          </div>
+                    <div className="space-y-2">
+            <Label>Skills</Label>
+            {skills.map((skill, index) => (
+              <div key={index} className="space-y-2 border p-2 rounded">
+                <Input
+                  value={skill.name}
+                  onChange={(e) => handleSkillChange(index, "name", e.target.value)}
+                  placeholder="Skill name"
+                  className={cn(errors[`skills.${index}.name`] && "border-red-500")}
+                />
+                {errors[`skills.${index}.name`] && (
+                  <p className="text-red-500 text-sm">{errors[`skills.${index}.name`]}</p>
+                )}
+
+                {skills.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => handleRemoveSkill(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={handleAddSkill}
+            >
+              <Plus className="mr-2 h-4 w-4" /> Add Skill
             </Button>
           </div>
           <Button type="submit">Done</Button>
