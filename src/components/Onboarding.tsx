@@ -162,7 +162,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
       <DialogContent
         className="p-10"
         onInteractOutside={(e) => e.preventDefault()}
-        hideCloseButton
       >
         <DialogHeader>
           <DialogTitle>Onboarding Form</DialogTitle>
