@@ -8,15 +8,19 @@ type BadgeProps = {
   status: BadgeStatus;
 };
 
-type JourneyItem = {
-  title: string;
-  iconName: string;
-  content: {
-    title: string;
-    status?: BadgeStatus;
-    date: string;
-    details?: string[];
-  }[];
+
+type Status = 'PENDING'|'APPROVED'|'REJECTED'
+type JobDetails = {
+  id: number;
+  startDate: string; // Use Date if working directly with Date objects
+  endDate: string;   // Use Date if working directly with Date objects
+  company: string;
+  jobTitle: string;
+  jobDescription: string;
+  status:Status;
+  skills: string[];
+  transactionId: string;
+  userId: number;
 };
 
 type CertificationItem = {
@@ -28,7 +32,7 @@ type CertificationItem = {
 };
 
 type EnhancedProfilePageProps = {
-  journeyData: JourneyItem[];
+  JobDetails: JobDetails[];
   certificationData: CertificationItem[];
 };
 
@@ -61,7 +65,7 @@ const Badge: React.FC<BadgeProps> = ({ status }) => {
   );
 };
 
-const EnhancedProfilePage: React.FC<EnhancedProfilePageProps> = ({ journeyData, certificationData }) => {
+const EnhancedProfilePage: React.FC<EnhancedProfilePageProps> = ({ JobDetails, certificationData }) => {
   const getIcon = (iconName: string) => {
     const icons = {
       BriefcaseIcon,
@@ -78,29 +82,29 @@ const EnhancedProfilePage: React.FC<EnhancedProfilePageProps> = ({ journeyData, 
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center">My Professional Journey</h2>
-          <Timeline data={journeyData.map(item => ({
-            ...item,
-            icon: getIcon(item.iconName),
+          <Timeline
+           // @ts-ignore
+          data={JobDetails.map(job => ({
+            ...job,
+            icon: getIcon('BriefcaseIcon'),
             content: (
-              <div key={item.title} className="bg-gray-800 rounded-lg p-6 shadow-lg">
-                {item.content.map((contentItem, contentIndex) => (
-                  <div key={contentIndex}>
-                    <h3 className="text-xl font-semibold mb-2 text-teal-300">{contentItem.title}</h3>
-                    {contentItem.status && <Badge status={contentItem.status} />}
-                    <p className="text-gray-400 text-sm mb-4">{contentItem.date}</p>
-                    {contentItem.details && contentItem.details.length > 0 && (
-                      <ul className="space-y-2 text-gray-300">
-                        {contentItem.details.map((detail, detailIndex) => (
-                          <li key={detailIndex} className="flex items-start">
-                            <span className="text-teal-400 mr-2">•</span>
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
+            
+              <div className="job-card bg-gray-800 text-white p-4 rounded-md shadow-md mb-4">
+                
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-lg font-semibold">{job.jobTitle} at {job.company}</h2>
+        <span className={`status-badge bg-${job.status === 'APPROVED' ? 'green' : job.status === 'PENDING' ? 'yellow' : 'red'}-500 text-white py-1 px-2 rounded-full text-xs`}>
+          {job.status === 'APPROVED' ? 'Approved' : job.status === 'PENDING' ? 'Pending' : 'Rejected'}
+        </span>
+      </div>
+      <p className="text-sm mb-2">{new Date(job.startDate).toLocaleString('default', { month: 'long', year: 'numeric' })} - {new Date(job.endDate).toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
+      <ul className="list-disc list-inside mb-4">
+        {job.skills.map((skill, index) => (
+          <li key={index} className="text-sm">{skill}</li>
+        ))}
+      </ul>
+      <p className="text-sm">{job.jobDescription}</p>
+    </div>
             )
           }))} />
           <h2 className="text-3xl font-bold text-center my-8">Certifications</h2>
