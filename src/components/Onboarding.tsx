@@ -22,7 +22,6 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Define Zod schema for validation
 const WorkExperienceSchema = z
   .object({
     organisation: z.string().min(1, "Organisation is required"),
@@ -38,6 +37,7 @@ const WorkExperienceSchema = z
         invalid_type_error: "End date must be a valid date",
       })
       .nullable(),
+    skills: z.array(z.string()).min(1, "At least one skill is required"),
   })
   .refine(
     (data) => {
@@ -74,7 +74,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
   const [education, setEducation] = useState(data?.education || "");
   const [workExperience, setWorkExperience] = useState<WorkExperience[]>(
     data?.workExperience || [
-      { organisation: "", startDate: null, endDate: null },
+      { organisation: "", startDate: null, endDate: null, skills: [] },
     ]
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -87,7 +87,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
   const handleAddWorkExperience = () => {
     setWorkExperience([
       ...workExperience,
-      { organisation: "", startDate: undefined, endDate: undefined },
+      { organisation: "", startDate: null, endDate: null, skills: [] },
     ]);
   };
 
@@ -100,13 +100,25 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
   const handleWorkExperienceChange = (
     index: number,
     field: keyof WorkExperience,
-    value: string | Date | null
+    value: string | Date | null | string[]
   ) => {
     const updatedWorkExperience = [...workExperience];
     updatedWorkExperience[index] = {
       ...updatedWorkExperience[index],
       [field]: value,
     };
+    setWorkExperience(updatedWorkExperience);
+  };
+
+  const handleAddSkill = (index: number, skill: string) => {
+    const updatedWorkExperience = [...workExperience];
+    updatedWorkExperience[index].skills.push(skill);
+    setWorkExperience(updatedWorkExperience);
+  };
+
+  const handleRemoveSkill = (expIndex: number, skillIndex: number) => {
+    const updatedWorkExperience = [...workExperience];
+    updatedWorkExperience[expIndex].skills.splice(skillIndex, 1);
     setWorkExperience(updatedWorkExperience);
   };
 
@@ -144,22 +156,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
       setShowAlert(true);
     }
   };
-  const [skills, setSkills] = useState([{ name: "" }]);
-
-  const handleSkillChange = (index, field, value) => {
-    const newSkills = [...skills];
-    newSkills[index][field] = value;
-    setSkills(newSkills);
-  };
-
-  const handleAddSkill = () => {
-    setSkills([...skills, { name: "" }]);
-  };
-
-  const handleRemoveSkill = (index) => {
-    const newSkills = skills.filter((_, i) => i !== index);
-    setSkills(newSkills);
-  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -174,11 +170,12 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
         {showAlert && (
           <Alert variant="destructive">
             <AlertDescription>
-              Please fill in all required fields, including dates.
+              Please fill in all required fields, including dates and skills.
             </AlertDescription>
           </Alert>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name and Education fields remain the same */}
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -254,11 +251,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
                         mode="single"
                         selected={exp.startDate}
                         onSelect={(date) =>
-                          handleWorkExperienceChange(
-                            index,
-                            "startDate",
-                            date || undefined
-                          )
+                          handleWorkExperienceChange(index, "startDate", date)
                         }
                         initialFocus
                       />
@@ -288,11 +281,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
                         mode="single"
                         selected={exp.endDate}
                         onSelect={(date) =>
-                          handleWorkExperienceChange(
-                            index,
-                            "endDate",
-                            date || undefined
-                          )
+                          handleWorkExperienceChange(index, "endDate", date)
                         }
                         initialFocus
                       />
@@ -309,6 +298,41 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
                     {errors[`workExperience.${index}.endDate`]}
                   </p>
                 )}
+                <div className="space-y-2">
+                  <Label>Skills</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {exp.skills.map((skill, skillIndex) => (
+                      <div
+                        key={skillIndex}
+                        className="bg-gray-100 px-2 py-1 rounded-full flex items-center"
+                      >
+                        <span>{skill}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="ml-1 p-0 h-4 w-4"
+                          onClick={() => handleRemoveSkill(index, skillIndex)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <Input
+                    placeholder="Add a skill and press Enter"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const target = e.target as HTMLInputElement;
+                        if (target.value.trim()) {
+                          handleAddSkill(index, target.value.trim());
+                          target.value = "";
+                        }
+                      }
+                    }}
+                  />
+                </div>
                 {workExperience.length > 1 && (
                   <Button
                     type="button"
@@ -331,49 +355,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ data, onSubmit }) => {
               <Plus className="mr-2 h-4 w-4" /> Add Work Experience
             </Button>
           </div>
-          <div className="space-y-2">
-            <Label>Skills</Label>
-            {skills.map((skill, index) => (
-              <div key={index} className="space-y-2 border p-2 rounded">
-                <Input
-                  value={skill.name}
-                  onChange={(e) =>
-                    handleSkillChange(index, "name", e.target.value)
-                  }
-                  placeholder="Skill name"
-                  className={cn(
-                    errors[`skills.${index}.name`] && "border-red-500"
-                  )}
-                />
-                {errors[`skills.${index}.name`] && (
-                  <p className="text-red-500 text-sm">
-                    {errors[`skills.${index}.name`]}
-                  </p>
-                )}
-
-                {skills.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => handleRemoveSkill(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-2"
-              onClick={handleAddSkill}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Add Skill
-            </Button>
-          </div>
-
           <Button type="submit">Done</Button>
         </form>
       </DialogContent>
