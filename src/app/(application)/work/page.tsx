@@ -6,9 +6,12 @@ import InitCredentialStore from "@/components/employee/InitCred";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { Sidebar } from "@/components/SideBar";
 import { getUserFromDb } from "@/e.actions";
+import { useUser } from "../ClientLayout";
+
 export default function WorkPage() {
   const [userData, setUserData] = useState(false);
-  const { user, getUser } = useKindeBrowserClient();
+  const user = useUser();
+  console.log(user);
   useEffect(() => {
     // Simulating data fetch or checking for existing data
     // Replace this with actual data fetching logic
@@ -34,7 +37,7 @@ export default function WorkPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-10">
       <div className="w-[250px] border-r-4 border-gray-700">
-        <Sidebar />
+        <Sidebar user={user} />
       </div>
 
       {userData ? (

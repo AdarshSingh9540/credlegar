@@ -3,7 +3,16 @@
 import React from "react";
 import { Calendar, Menu, PlusSquare, Search } from "lucide-react";
 import Link from "next/link";
-export const Sidebar: React.FC = () => {
+import { UserData } from "@/app/(application)/ServerLayout";
+
+interface ComponentProps {
+  user: UserData | null;
+}
+
+export const Sidebar = ({ user }: ComponentProps) => {
+  if (user === null) {
+    return;
+  }
   // const {getUser} = getKindeServerSession();
   // const user = await getUser();
   const sidebarItems = [
@@ -18,16 +27,10 @@ export const Sidebar: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-blue-500 rounded-full">
-              <img
-                src="https://avatars.githubusercontent.com/u/131537713?v=4"
-                alt="User Avatar"
-              />
+              <img src={user?.profilePic} alt="User Avatar" />
             </div>
-            <span className="font-semibold text-lg">Adarsh</span>
+            <span className="font-semibold text-lg">{user.firstName}</span>
           </div>
-          <button className="lg:hidden">
-            <span className="material-symbols-outlined">close</span>
-          </button>
         </div>
         <div className="flex flex-col space-y-4 lg:space-y-2">
           {sidebarItems.map((item, index) => (
