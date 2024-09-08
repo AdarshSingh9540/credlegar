@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import WorkExperienceCard from "@/components/employee/WorkExperienceCard";
 import Onboarding from "@/components/Onboarding";
 import InitCredentialStore from "@/components/employee/InitCred";
-import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+
 import { Sidebar } from "@/components/SideBar";
 import { getUserFromDb } from "@/e.actions";
 import { useUser } from "../ClientLayout";

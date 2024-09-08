@@ -4,6 +4,7 @@ import React from "react";
 import { Calendar, Menu, PlusSquare, Search } from "lucide-react";
 import Link from "next/link";
 import { UserData } from "@/app/(application)/ServerLayout";
+import { PersonIcon } from "@radix-ui/react-icons";
 
 interface ComponentProps {
   user: UserData | null;
@@ -16,9 +17,8 @@ export const Sidebar = ({ user }: ComponentProps) => {
   // const {getUser} = getKindeServerSession();
   // const user = await getUser();
   const sidebarItems = [
-    { icon: <Search size={18} />, text: "Search", href: "/" },
     { icon: <PlusSquare size={18} />, text: "Home", href: "/" },
-    { icon: <Calendar size={18} />, text: "Calendar", href: "/" },
+    { icon: <PersonIcon />, text: "Your Profile", href: "/profile" },
   ];
 
   return (
@@ -37,7 +37,7 @@ export const Sidebar = ({ user }: ComponentProps) => {
             <Link
               key={index}
               href={item.href}
-              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-200 py-2 px-3 rounded"
+              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-600 py-2 px-3 rounded"
             >
               {item.icon}
               <span>{item.text}</span>
@@ -48,25 +48,25 @@ export const Sidebar = ({ user }: ComponentProps) => {
           <h3 className="text-xs font-semibold mb-2 hidden lg:block mt-6">
             Private
           </h3>
-          <div className="py-2 px-2 cursor-pointer hover:bg-gray-200 rounded flex items-center mt-4 lg:mt-0">
+          <div className="py-2 px-2 cursor-pointer hover:bg-gray-600 rounded flex items-center mt-4 lg:mt-0">
             <Link href="/" className="flex items-center space-x-2">
               {/* <span className="material-symbols-outlined">dashboard</span> */}
               <span>DashBoard</span>
             </Link>
           </div>
-          <div className="py-2 px-2 cursor-pointer hover:bg-gray-200 rounded flex items-center">
+          <div className="py-2 px-2 cursor-pointer hover:bg-gray-600 rounded flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               {/* <span className="material-symbols-outlined">add_task</span> */}
               <span>TaskList</span>
             </Link>
           </div>
-          <div className="py-2 px-2 cursor-pointer hover:bg-gray-200 rounded flex items-center">
+          <div className="py-2 px-2 cursor-pointer hover:bg-gray-600 rounded flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               {/* <span className="material-symbols-outlined">diversity_3</span> */}
               <span>All Members</span>
             </Link>
           </div>
-          <div className="py-2 px-2 cursor-pointer hover:bg-gray-200 rounded flex items-center">
+          <div className="py-2 px-2 cursor-pointer hover:bg-gray-600 rounded flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               {/* <span className="material-symbols-outlined">settings</span> */}
               <span>Setting</span>
