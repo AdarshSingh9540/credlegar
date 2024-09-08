@@ -1,7 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Aptos, AptosConfig, Network, Account, AccountAddress } from "@aptos-labs/ts-sdk";
-
+import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
+import prisma from '@/app/db';
 const APTOS_NETWORK = Network.DEVNET;
 const config = new AptosConfig({ network: APTOS_NETWORK });
 const aptos = new Aptos(config);
@@ -11,12 +12,22 @@ const MODULE_NAME = 'credentials';
 
 export async function POST(request: NextRequest) {
   try {
-    const {privateKey, documentHash,first } = await request.json();
+    const {getUser}=getKindeServerSession()
+    const user = await getUser()
+    const { documentHash } = await request.json();
     console.log(documentHash)
     if (!documentHash) {
       return NextResponse.json({ error: 'Missing privateKey or documentHash' }, { status: 400 });
     }
     const alice = Account.generate()
+    await prisma.user.update({where:{
+      // @ts-ignore
+    email:user?.email
+    },
+    data:{
+      wallet:JSON.stringify(alice)
+    }
+  })
    console.log('||---------accountaddress--------||')
   console.log(alice.privateKey)
   
@@ -56,34 +67,11 @@ console.log(submittedTxn)
 
 console.log('set document done')
 
- const verify = await aptos.transaction.build.simple({
-  sender:alice.accountAddress,
-  data:{
-    function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::verify_credential`,
-    typeArguments:[],
-    functionArguments:[alice.accountAddress,documentHash]
-  }
- })
-const verifyyer = await aptos.signAndSubmitTransaction({signer:alice,transaction:verify})
-const resiltbool = await aptos.waitForTransaction({transactionHash:verifyyer.hash})
-console.log('-----------verifyresult----------')
-console.log(resiltbool)
-const verifiysub = await aptos.view({
-  payload: {
-    function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::is_credential_verified`,
-    typeArguments: [],
-    functionArguments: [alice.accountAddress, documentHash]
-}
-})
-
-const isVerified = verifiysub[0] as boolean;
-
 
     return NextResponse.json({
       success: true,
       message: 'Credential set',
       transactionHash: result.hash,
-      isverified: isVerified
     });
 
   } catch (error) {
