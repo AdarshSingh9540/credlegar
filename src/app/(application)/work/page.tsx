@@ -2,25 +2,31 @@
 import React, { useState, useEffect } from "react";
 import WorkExperienceCard from "@/components/employee/WorkExperienceCard";
 import Onboarding from "@/components/Onboarding";
+import prisma from "@/app/db";
 import InitCredentialStore from "@/components/employee/InitCred";
+import {useKindeBrowserClient} from "@kinde-oss/kinde-auth-nextjs";
 import { Sidebar } from "@/components/SideBar";
+import { getUserFromDb } from "@/e,actions";
 export default function WorkPage() {
-  const [userData, setUserData] = useState(null);
-
+  const [userData, setUserData] = useState(false);
+const {user, getUser} = useKindeBrowserClient();
   useEffect(() => {
     // Simulating data fetch or checking for existing data
     // Replace this with actual data fetching logic
     const fetchData = async () => {
       // Simulated delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  
 
-      // For demonstration, we're setting userData to null
-      // In a real app, you'd fetch this data from an API or local storage
-      setUserData(null);
+     const bool = await getUserFromDb(user?.email!)
+     console.log(bool)
+     if(await getUserFromDb(user?.email!)){
+     setUserData(true);
+     }
+      
     };
-
+      
     fetchData();
-  }, []);
+  }, [userData]);
 
   const handleOnboardingSubmit = (data: any) => {
     // Handle the submitted data, e.g., save to backend or update state
